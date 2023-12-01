@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Nonlinear_Optimization)
 
-set(LIBRARY_NAME "LineSearch")
+set(LIBRARY_NAME "Optimization")
 
 add_subdirectory(src)
 add_subdirectory(examples)

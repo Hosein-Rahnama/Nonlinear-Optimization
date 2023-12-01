@@ -2,3 +2,7 @@
 
 build/*
 !build/bash
+
+# Ignore vscode setting
+
+.vscode
