@@ -1,0 +1,4 @@
+# Ignore content of the build folder
+
+build/*
+!build/bash
