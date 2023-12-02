@@ -8,7 +8,7 @@ namespace Optimization
 
 QuasiNewton::QuasiNewton()
 {
-    setMaxNumIterations(10000);
+    setMaxNumIterations(100000);
     
     setGradientTol(1e-9);
     

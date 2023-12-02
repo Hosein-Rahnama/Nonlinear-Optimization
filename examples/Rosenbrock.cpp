@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Optimization/BFGS.hpp>
+#include <Optimization/SteepestDescent.hpp>
 
 static double objFunc(const Eigen::VectorXd & parameters)
 {
@@ -28,10 +29,26 @@ int main()
 {
     try 
     {
-        const Eigen::Vector2d initialParameters(-5, 10);
-        ObjFuncApproxDerivative objFuncApproxDerivative;
+        Optimization::SteepestDescent sd;
         Optimization::BFGS bfgs;
         Optimization::Result result;
+
+        const Eigen::Vector2d initialParameters(-5, 10);
+        ObjFuncApproxDerivative objFuncApproxDerivative;
+
+        // Using anyltic derivative & Steepest Descent
+        sd(objFuncAnalyticDerivative, initialParameters, result);
+
+        std::cout << "---------- Steepest Descent and Analytic Derivative ---------------" << std::endl;
+        std::cout << result << std::endl;
+        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
+        
+        // Using approximative derivative & Steepest Descent
+        sd(objFuncApproxDerivative, initialParameters, result);
+        
+        std::cout << "---------- Steepest Descent and Approximate Derivative ------------" << std::endl;
+        std::cout << result << std::endl;
+        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
         
         // Using anyltic derivative & BFGS
         bfgs(objFuncAnalyticDerivative, initialParameters, result);

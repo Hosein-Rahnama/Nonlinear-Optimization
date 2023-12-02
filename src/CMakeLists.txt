@@ -1,5 +1,5 @@
 add_library(
-    ${LIBRARY_NAME} BFGS.cpp LineSearchNocedal.cpp QuasiNewton.cpp
+    ${LIBRARY_NAME} SteepestDescent.cpp BFGS.cpp LineSearchNocedal.cpp QuasiNewton.cpp
 )
 
 target_include_directories(
