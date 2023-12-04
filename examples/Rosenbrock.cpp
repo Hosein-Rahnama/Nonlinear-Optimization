@@ -1,15 +1,17 @@
 #include <iostream>
+
 #include <Optimization/BFGS.hpp>
 #include <Optimization/SteepestDescent.hpp>
+
 
 static double objFunc(const Eigen::VectorXd & parameters)
 {
     return 100 * std::pow(parameters(1) - std::pow(parameters(0), 2), 2) + std::pow(1 - parameters(0), 2);
 }
 
-static void objFuncAnalyticDerivative(const Eigen::VectorXd & parameters,
-                                      double & funcValue,
-                                      Eigen::VectorXd & gradient)
+static void objFuncInfo(const Eigen::VectorXd & parameters,
+                        double & funcValue,
+                        Eigen::VectorXd & gradient)
 {   
     funcValue = objFunc(parameters); 
     gradient(0) = -400 * (parameters(1) - std::pow(parameters(0), 2.0)) * parameters(0) - 2 * (1 - parameters(0));
@@ -27,48 +29,29 @@ class ObjFuncApproxDerivative : public Optimization::ApproxDerivative
 
 int main()
 {
-    try 
-    {
-        Optimization::SteepestDescent sd;
-        Optimization::BFGS bfgs;
-        Optimization::Result result;
+    ObjFuncApproxDerivative objFuncInfoApproxDerivative;
+    const Eigen::Vector2d initialParameters(-5, 10);
+    Optimization::Result result;
 
-        const Eigen::Vector2d initialParameters(-5, 10);
-        ObjFuncApproxDerivative objFuncApproxDerivative;
+    // Use Steepest Descent with exact derivative
+    Optimization::SteepestDescent(objFuncInfo, initialParameters).solve(result);
+    std::cout << "------------ Steepest Descent and Analytic Derivative ----------------" << std::endl;
+    std::cout << result << std::endl;
 
-        // Using anyltic derivative & Steepest Descent
-        sd(objFuncAnalyticDerivative, initialParameters, result);
+    // Use BFGS with exact derivative
+    Optimization::BFGS(objFuncInfo, initialParameters).solve(result);
+    std::cout << "------------------ BFGS and Analytic Derivative ----------------------" << std::endl;
+    std::cout << result << std::endl;
+    
+    // Use Steepest Descent with approximate derivative
+    Optimization::SteepestDescent(objFuncInfoApproxDerivative, initialParameters).solve(result);
+    std::cout << "------------ Steepest Descent and Approximate Derivative -------------" << std::endl;
+    std::cout << result << std::endl;
+    
+    // Use BFGS with approximate derivative
+    Optimization::BFGS(objFuncInfoApproxDerivative, initialParameters).solve(result);
+    std::cout << "------------------ BFGS and Approximate Derivative -------------------" << std::endl;
+    std::cout << result << std::endl;
 
-        std::cout << "---------- Steepest Descent and Analytic Derivative ---------------" << std::endl;
-        std::cout << result << std::endl;
-        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
-        
-        // Using approximative derivative & Steepest Descent
-        sd(objFuncApproxDerivative, initialParameters, result);
-        
-        std::cout << "---------- Steepest Descent and Approximate Derivative ------------" << std::endl;
-        std::cout << result << std::endl;
-        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
-        
-        // Using anyltic derivative & BFGS
-        bfgs(objFuncAnalyticDerivative, initialParameters, result);
-
-        std::cout << "---------------- BFGS and Analytic Derivative ---------------------" << std::endl;
-        std::cout << result << std::endl;
-        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
-        
-        // Using approximative derivative & BFGS
-        bfgs(objFuncApproxDerivative, initialParameters, result);
-        
-        std::cout << "---------------- BFGS and Approximate Derivative ------------------" << std::endl;
-        std::cout << result << std::endl;
-        std::cout << "Optimal parameters: " << result.optParameters.transpose() << std::endl << std::endl;
-    } 
-    catch (std::exception & ex) 
-    {
-        std::cout << "Error: " << ex.what() << std::endl;
-        
-        return 1;
-    }
     return 0;
 }

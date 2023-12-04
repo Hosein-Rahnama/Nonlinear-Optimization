@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <Optimization/Function.hpp>
 #include <Eigen/Dense>
+#include <Optimization/Function.hpp>
 
 
 namespace Optimization 
@@ -19,7 +19,7 @@ class LineSearch
         
         virtual ~LineSearch() { }
         
-        virtual bool search(Function &              function,
+        virtual bool search(Function &              decoratedObjFuncInfo,
                             const Eigen::VectorXd & lastParameters,
                             const Eigen::VectorXd & lastGradient,
                             const Eigen::VectorXd & direction,
@@ -36,7 +36,7 @@ class LineSearchNocedal : public LineSearch
         
         ~LineSearchNocedal();
         
-        bool search(Function &               function,
+        bool search(Function &               decoratedObjFuncInfo,
                     const Eigen::VectorXd &  lastParameters,
                     const Eigen::VectorXd &  lastGradient,
                     const Eigen::VectorXd &  direction,
@@ -50,7 +50,6 @@ class LineSearchNocedal : public LineSearch
          *  The default value is 1,000.
          */
         void setMaxNumIterations(unsigned int numIterations);
-        
         unsigned int getMaxNumIterations() const;
         
         /* 
@@ -64,7 +63,7 @@ class LineSearchNocedal : public LineSearch
                              double wolfeCoeff);
         
         double getArmijoCoeff() const;
-        
+
         double getWolfeCoeff() const;
         
     private:
@@ -82,9 +81,7 @@ class LineSearchNocedal : public LineSearch
                                Eigen::VectorXd & gradient) const 
         {
             parameters = (*initParameters) + stepLength * (*direction);
-            
-            (*function)(parameters, funcValue, gradient);
-            
+            (*decoratedObjFuncInfo)(parameters, funcValue, gradient);
             const double gradDotDir = gradient.dot(*direction);
             
             return gradDotDir;
@@ -93,29 +90,28 @@ class LineSearchNocedal : public LineSearch
         inline bool checkArmijo(double stepLength,
                                 double funcValue) const 
         {
-            // Check the Armijo condition (sufficient decrease condition).
+            // Check the Armijo os sufficient decrease condition.
             return funcValue <= (initFuncValue + stepLength * testArmijo);
         }
         
         inline bool checkWolfe(double gradDotDir) const 
         {
-            // Check the Wolfe condition (curvature condition).
+            // Check the Wolfe or curvature condition.
             return gradDotDir >= testWolfe;
         }
         
     private:
-        unsigned int            maxNumIterations;
         double                  armijoCoeff;
         double                  wolfeCoeff;
+        unsigned int            maxNumIterations;
         
-        Function *              function;
+        Function *              decoratedObjFuncInfo;
         const Eigen::VectorXd * initParameters;
         const Eigen::VectorXd * direction;
         double                  initFuncValue;
         unsigned int            numIterations;
         double                  testArmijo;
-        double                  testWolfe;
-        
+        double                  testWolfe;        
 };
 
 }

@@ -1,28 +1,40 @@
 #pragma once
 
-#include <Optimization/QuasiNewton.hpp>
+#include <Optimization/BaseAlgorithm.hpp>
 
 
 namespace Optimization 
 {
 
-class SteepestDescent : public QuasiNewton 
+class SteepestDescent : public BaseAlgorithm 
 {
     public:
-        SteepestDescent();
+        SteepestDescent(const Function &        objFuncInfo,
+                        const Eigen::VectorXd & initialParameters,
+                        double                  gradTol = 1e-9,
+                        double                  relTol = 1e-9,
+                        unsigned int            maxNumIterations = 100000,
+                        LineSearch::Ptr         lineSearch = std::make_shared<LineSearchNocedal>());
         
         ~SteepestDescent();
         
     private:
-        void initialDirection(const Eigen::VectorXd & gradient,
-                              Eigen::VectorXd &       direction) override;
+        inline void initialDirection(const Eigen::VectorXd & gradient,
+                                     Eigen::VectorXd &       direction) override
+        {
+            direction = -1 * gradient;
+        }
+
         
-        void updateDirection(const Eigen::VectorXd & parameters,
-                             const Eigen::VectorXd & gradient,
-                             const Eigen::VectorXd & lastParameters,
-                             const Eigen::VectorXd & lastGradient,
-                             unsigned int            numIterations,
-                             Eigen::VectorXd &       direction) override; 
+        inline void updateDirection(const Eigen::VectorXd & parameters,
+                                    const Eigen::VectorXd & gradient,
+                                    const Eigen::VectorXd & lastParameters,
+                                    const Eigen::VectorXd & lastGradient,
+                                    unsigned int            numIterations,
+                                    Eigen::VectorXd &       direction) override
+        {
+            direction = -1 * gradient;
+        }
 };
 
 }

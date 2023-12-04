@@ -4,7 +4,19 @@
 namespace Optimization 
 {
 
-BFGS::BFGS()
+BFGS::BFGS(const Function &        objFuncInfo,
+           const Eigen::VectorXd & initialParameters,
+           double                  gradTol,
+           double                  relTol,
+           unsigned int            maxNumIterations,
+           LineSearch::Ptr         lineSearch)
+           :
+           BaseAlgorithm(objFuncInfo,
+                         initialParameters,
+                         gradTol,
+                         relTol,
+                         maxNumIterations,
+                         lineSearch)
 {
     
 }
@@ -12,16 +24,6 @@ BFGS::BFGS()
 BFGS::~BFGS()
 {
 
-}
-
-void BFGS::operator()(const Function &        function,
-                      const Eigen::VectorXd & initialParameters,
-                      Result &                result)
-{
-    numParameters = initialParameters.size();
-    
-    // Call actual quasi Newton optimization
-    QuasiNewton::operator()(function, initialParameters, result);
 }
 
 void BFGS::initialDirection(const Eigen::VectorXd & gradient,

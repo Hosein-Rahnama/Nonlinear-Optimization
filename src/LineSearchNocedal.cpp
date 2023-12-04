@@ -8,9 +8,8 @@ namespace Optimization
 
 LineSearchNocedal::LineSearchNocedal()
 {
-    setMaxNumIterations(1000);
-    
     setCoefficients(1e-4, 0.9);
+    setMaxNumIterations(1000);
 }
 
 LineSearchNocedal::~LineSearchNocedal()
@@ -18,9 +17,9 @@ LineSearchNocedal::~LineSearchNocedal()
 
 }
 
-bool LineSearchNocedal::search(Function &              function,
-                               const Eigen::VectorXd & initialParameters,
-                               const Eigen::VectorXd & initialGradient,
+bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
+                               const Eigen::VectorXd & initParameters,
+                               const Eigen::VectorXd & initGradient,
                                const Eigen::VectorXd & direction,
                                Eigen::VectorXd &       parameters,
                                double &                funcValue,
@@ -39,21 +38,21 @@ bool LineSearchNocedal::search(Function &              function,
         throw std::invalid_argument("Initial step length must be greater than zero.");
     }
     
-    const double initGradDotDir = initialGradient.dot(direction);
+    const double initGradDotDir = initGradient.dot(direction);
     
-    // Ensure that the initial direction points to a descent direction.
+    // Ensure that the initial direction is a descent direction.
     if (0 < initGradDotDir) 
     {
-        throw std::invalid_argument("Direction doesn't point to a descent direction.");
+        throw std::invalid_argument("Direction is not a descent direction.");
     }
     
-    this->function       = &function;
-    this->initParameters = &initialParameters;
-    this->direction      = &direction;
-    this->initFuncValue  = funcValue;
-    this->testArmijo     = armijoCoeff * initGradDotDir;
-    this->testWolfe      = wolfeCoeff * initGradDotDir;
-    this->numIterations  = 0;
+    this->decoratedObjFuncInfo = &decoratedObjFuncInfo;
+    this->initParameters       = &initParameters;
+    this->direction            = &direction;
+    this->initFuncValue        = funcValue;
+    this->testArmijo           = armijoCoeff * initGradDotDir;
+    this->testWolfe            = wolfeCoeff * initGradDotDir;
+    this->numIterations        = 0;
     
     double lastStepLength = 0.0;
     double lastFuncValue  = initFuncValue;
@@ -67,8 +66,7 @@ bool LineSearchNocedal::search(Function &              function,
         
         if (!checkArmijo(stepLength, funcValue) || funcValue >= lastFuncValue) 
         {
-            return zoom(lastStepLength, lastFuncValue, stepLength,
-                        parameters, funcValue, gradient, stepLength);
+            return zoom(lastStepLength, lastFuncValue, stepLength, parameters, funcValue, gradient, stepLength);
         }
         
         if (checkWolfe(gradDotDir)) 
@@ -79,8 +77,7 @@ bool LineSearchNocedal::search(Function &              function,
         
         if (gradDotDir >= 0.0) 
         {
-            return zoom(stepLength, funcValue, lastStepLength,
-                        parameters, funcValue, gradient, stepLength);
+            return zoom(stepLength, funcValue, lastStepLength, parameters, funcValue, gradient, stepLength);
         }
         
         if (numIterations > maxNumIterations) 
@@ -117,7 +114,8 @@ bool LineSearchNocedal::zoom(double            stepLengthLo, // Smaller function
      *   Springer, 2nd edition, Springer, 2006, Page 61
      */
     
-    while (true) {
+    while (true) 
+    {
         ++numIterations;
         
         if (std::fabs(stepLengthHi - stepLengthLo) < DBL_EPSILON) 

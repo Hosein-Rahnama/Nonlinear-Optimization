@@ -4,30 +4,26 @@
 namespace Optimization 
 {
 
-SteepestDescent::SteepestDescent()
+SteepestDescent::SteepestDescent(const Function &        objFuncInfo,
+                                 const Eigen::VectorXd & initialParameters,
+                                 double                  gradTol,
+                                 double                  relTol,
+                                 unsigned int            maxNumIterations,
+                                 LineSearch::Ptr         lineSearch)
+                                 :
+                                 BaseAlgorithm(objFuncInfo,
+                                               initialParameters,
+                                               gradTol,
+                                               relTol,
+                                               maxNumIterations,
+                                               lineSearch)
 {
-    
+
 }
 
 SteepestDescent::~SteepestDescent()
 {
 
-}
-
-void SteepestDescent::initialDirection(const Eigen::VectorXd & gradient,
-                                       Eigen::VectorXd &       direction)
-{
-    direction = -1 * gradient;
-}
-
-void SteepestDescent::updateDirection(const Eigen::VectorXd & parameters,
-                                      const Eigen::VectorXd & gradient,
-                                      const Eigen::VectorXd & lastParameters,
-                                      const Eigen::VectorXd & lastGradient,
-                                      unsigned int            numIterations,
-                                      Eigen::VectorXd &       direction)
-{
-    direction = -1 * gradient;
 }
 
 }

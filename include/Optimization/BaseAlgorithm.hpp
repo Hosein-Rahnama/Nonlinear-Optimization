@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <Optimization/LineSearch.hpp>
 
 
@@ -19,36 +21,35 @@ struct Result
     ExitFlag        exitFlag;
     Eigen::VectorXd optParameters;
     double          optFuncValue;
-    double          firstOrderOptimality;
+    double          optGradNorm;
     unsigned int    numIterations;
     unsigned int    numFuncEvaluations;
 };
 
-class QuasiNewton 
+class BaseAlgorithm 
 {
     public:
-        QuasiNewton();
+        BaseAlgorithm(const Function &        objFuncInfo,
+                      const Eigen::VectorXd & initialParameters,
+                      double                  gradTol,
+                      double                  relTol,
+                      unsigned int            maxNumIterations,
+                      LineSearch::Ptr         lineSearch);
 
-        virtual ~QuasiNewton();
+        virtual ~BaseAlgorithm();
 
-        virtual void operator()(const Function &        function,
-                                const Eigen::VectorXd & initialParameters,
-                                Result &                result);
+        virtual void solve(Result & result);
 
         void setLineSearch(LineSearch::Ptr lineSearch);
-
         LineSearch::Ptr getLineSearch() const;
 
         void setMaxNumIterations(unsigned int maxNumIterations);
-
         unsigned int getMaxNumIterations() const;
 
         void setGradientTol(double gradTol);
-
         double getGradientTol() const;
 
         void setRelativeTol(double relTol);
-
         double getRelativeTol() const;
         
     private:
@@ -62,25 +63,28 @@ class QuasiNewton
                                      unsigned int            numIterations,
                                      Eigen::VectorXd &       direction) = 0;
 
-        void evaluateObjectiveFunction(const Eigen::VectorXd & parameters,
-                                       double &                funcValue,
-                                       Eigen::VectorXd &       gradient);
+        void evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
+                                 double &                funcValue,
+                                 Eigen::VectorXd &       gradient);
 
-        static inline double computeFirstOrderOpt(const Eigen::VectorXd & gradient) 
+        static inline double computeGradNorm(const Eigen::VectorXd & gradient) 
         {
             return gradient.lpNorm<Eigen::Infinity>();
         }
         
-    private:
-        LineSearch::Ptr lineSearch;
-        unsigned int    maxNumIterations;
-        double          gradTol;
-        double          relTol;
+    protected:
+        Eigen::VectorXd        initialParameters;
+        Eigen::VectorXd::Index numParameters;
+
+        double                 gradTol;
+        double                 relTol;
+        unsigned int           maxNumIterations;
+        unsigned int           numFuncEvaluations;
         
-        Function        objFunc;
-        Function        evalObjFunc;
-        unsigned int    numFuncEvaluations;
-        
+        LineSearch::Ptr        lineSearch;
+
+        Function               objFuncInfo;
+        Function               decoratedObjFuncInfo;
 };
 
 std::ostream & operator<<(std::ostream & os,

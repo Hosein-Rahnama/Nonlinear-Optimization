@@ -10,8 +10,8 @@ namespace Optimization
 {
 
 typedef std::function<void(const Eigen::VectorXd & parameters,
-                           double &                funcValue,
-                           Eigen::VectorXd &       gradient)> Function;
+                      double &                funcValue,
+                      Eigen::VectorXd &       gradient)> Function;
 
 class ApproxDerivative 
 {
@@ -30,14 +30,11 @@ class ApproxDerivative
             funcValue = objectiveFunction(parameters);
             
             gradParameters = parameters;
-            
             for (Eigen::VectorXd::Index i = 0;  i < numParameters; ++i)
             {
-                // Add epsilon to ith parameter.
+                // Compute gradient with forward difference.
                 gradParameters(i) += epsilon;
-                
                 const double value = objectiveFunction(gradParameters);
-                
                 gradient(i) = (value - funcValue) * invEpsilon;
                 
                 // Restore original parameter.

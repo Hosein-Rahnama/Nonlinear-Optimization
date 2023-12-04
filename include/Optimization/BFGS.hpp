@@ -1,21 +1,22 @@
 #pragma once
 
-#include <Optimization/QuasiNewton.hpp>
+#include <Optimization/BaseAlgorithm.hpp>
 
 
 namespace Optimization 
 {
 
-class BFGS : public QuasiNewton 
+class BFGS : public BaseAlgorithm 
 {
     public:
-        BFGS();
+        BFGS(const Function &        objFuncInfo,
+             const Eigen::VectorXd & initialParameters,
+             double                  gradTol = 1e-9,
+             double                  relTol = 1e-9,
+             unsigned int            maxNumIterations = 100000,
+             LineSearch::Ptr         lineSearch = std::make_shared<LineSearchNocedal>());
         
         ~BFGS();
-        
-        void operator()(const Function &        function,
-                        const Eigen::VectorXd & initialParameters,
-                        Result &                result) override;
         
     private:
         void initialDirection(const Eigen::VectorXd & gradient,
@@ -29,7 +30,6 @@ class BFGS : public QuasiNewton
                              Eigen::VectorXd &       direction) override;
         
     private:
-        unsigned int    numParameters;
         Eigen::MatrixXd inverseHessian;
         Eigen::VectorXd s;
         Eigen::VectorXd y;
