@@ -17,6 +17,12 @@ LineSearchNocedal::~LineSearchNocedal()
 
 }
 
+/*   
+ *  Implements line search algorithm 3.5 from
+ *  Jorge Nocedal and Stephen J. Wright, Numerical Optimization,
+ *  Springer, 2nd edition, Springer, 2006, Page 60
+ */
+
 bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
                                const Eigen::VectorXd & initParameters,
                                const Eigen::VectorXd & initGradient,
@@ -25,13 +31,7 @@ bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
                                double &                funcValue,
                                Eigen::VectorXd &       gradient,
                                double &                stepLength)
-{
-    /*   
-     *   Implements line search algorithm 3.5 from
-     *   Jorge Nocedal and Stephen J. Wright, Numerical Optimization,
-     *   Springer, 2nd edition, Springer, 2006, Page 60
-     */
-    
+{    
     // Step length has to be positive.
     if (stepLength <= 0) 
     {
@@ -47,15 +47,16 @@ bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
     }
     
     this->decoratedObjFuncInfo = &decoratedObjFuncInfo;
+
     this->initParameters       = &initParameters;
     this->direction            = &direction;
-    this->initFuncValue        = funcValue;
-    this->testArmijo           = armijoCoeff * initGradDotDir;
-    this->testWolfe            = wolfeCoeff * initGradDotDir;
+    this->armijoLineIntercept  = funcValue;
+    this->armijoLineSlope      = armijoCoeff * initGradDotDir;
+    this->strongWolfeRHS       = -wolfeCoeff * initGradDotDir;
     this->numIterations        = 0;
     
     double lastStepLength = 0.0;
-    double lastFuncValue  = initFuncValue;
+    double lastFuncValue  = armijoLineIntercept;
     
     while (true) 
     {
@@ -66,10 +67,10 @@ bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
         
         if (!checkArmijo(stepLength, funcValue) || funcValue >= lastFuncValue) 
         {
-            return zoom(lastStepLength, lastFuncValue, stepLength, parameters, funcValue, gradient, stepLength);
+            return zoom(lastStepLength, stepLength, lastFuncValue, parameters, funcValue, gradient, stepLength);
         }
         
-        if (checkWolfe(gradDotDir)) 
+        if (checkStrongWolfe(gradDotDir)) 
         {
             // Line search was successful.
             return true;
@@ -77,7 +78,7 @@ bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
         
         if (gradDotDir >= 0.0) 
         {
-            return zoom(stepLength, funcValue, lastStepLength, parameters, funcValue, gradient, stepLength);
+            return zoom(stepLength, lastStepLength, funcValue, parameters, funcValue, gradient, stepLength);
         }
         
         if (numIterations > maxNumIterations) 
@@ -100,9 +101,9 @@ bool LineSearchNocedal::search(Function &              decoratedObjFuncInfo,
     }
 }
 
-bool LineSearchNocedal::zoom(double            stepLengthLo, // Smaller function value, not smaller step length!
-                             double            funcValueLo,
-                             double            stepLengthHi, // Larger function value, not larger step length!
+bool LineSearchNocedal::zoom(double            stepLengthLow,  
+                             double            stepLengthHigh,
+                             double            funcValueLow,
                              Eigen::VectorXd & parameters,
                              double &          funcValue,
                              Eigen::VectorXd & gradient,
@@ -118,38 +119,38 @@ bool LineSearchNocedal::zoom(double            stepLengthLo, // Smaller function
     {
         ++numIterations;
         
-        if (std::fabs(stepLengthHi - stepLengthLo) < DBL_EPSILON) 
+        if (std::fabs(stepLengthHigh - stepLengthLow) < DBL_EPSILON) 
         {
             // Current step length interval too small.
             return false;
         }
         
         // Bisect current step length interval.
-        stepLength = 0.5 * (stepLengthLo + stepLengthHi);
+        stepLength = 0.5 * (stepLengthLow + stepLengthHigh);
         
         // Evaluate the function and gradient values.
         const double gradDotDir = evaluate(stepLength, parameters, funcValue, gradient);
         
-        if (!checkArmijo(stepLength, funcValue) || funcValue >= funcValueLo) 
+        if (!checkArmijo(stepLength, funcValue) || funcValue >= funcValueLow) 
         {
             // Change upper bound.
-            stepLengthHi = stepLength;
+            stepLengthHigh = stepLength;
         } 
         else 
         {
-            if (checkWolfe(gradDotDir)) 
+            if (checkStrongWolfe(gradDotDir)) 
             {
                 // Line search was successful.
                 return true;
             }
-            if (gradDotDir * (stepLengthHi - stepLengthLo) >= 0) 
+            if (gradDotDir * (stepLengthHigh - stepLengthLow) >= 0) 
             {
                 // Change upper bound.
-                stepLengthHi = stepLengthLo;
+                stepLengthHigh = stepLengthLow;
             }
             // Change lower bound.
-            stepLengthLo = stepLength;
-            funcValueLo  = funcValue;
+            stepLengthLow = stepLength;
+            funcValueLow  = funcValue;
         }
         if (numIterations > maxNumIterations) 
         {

@@ -59,17 +59,16 @@ class LineSearchNocedal : public LineSearch
          *  The wolfeCoeff must be in (armijoCoeff, 1).
          *  The default value is 0.9.
          */
-        void setCoefficients(double armijoCoeff,
-                             double wolfeCoeff);
+        void setCoefficients(double armijoCoeff, double wolfeCoeff);
         
         double getArmijoCoeff() const;
 
         double getWolfeCoeff() const;
         
     private:
-        bool zoom(double            stepLengthLo,
-                  double            funcValueLo,
-                  double            stepLengthHi,
+        bool zoom(double            stepLengthLow,
+                  double            stepLengthHigh,
+                  double            funcValueLow,
                   Eigen::VectorXd & parameters,
                   double &          funcValue,
                   Eigen::VectorXd & gradient,
@@ -91,27 +90,27 @@ class LineSearchNocedal : public LineSearch
                                 double funcValue) const 
         {
             // Check the Armijo os sufficient decrease condition.
-            return funcValue <= (initFuncValue + stepLength * testArmijo);
+            return funcValue <= (armijoLineIntercept + stepLength * armijoLineSlope);
         }
         
-        inline bool checkWolfe(double gradDotDir) const 
+        inline bool checkStrongWolfe(double gradDotDir) const 
         {
             // Check the Wolfe or curvature condition.
-            return gradDotDir >= testWolfe;
+            return std::fabs(gradDotDir) <= strongWolfeRHS;
         }
         
     private:
+        Function *              decoratedObjFuncInfo;
         double                  armijoCoeff;
         double                  wolfeCoeff;
         unsigned int            maxNumIterations;
         
-        Function *              decoratedObjFuncInfo;
         const Eigen::VectorXd * initParameters;
         const Eigen::VectorXd * direction;
-        double                  initFuncValue;
-        unsigned int            numIterations;
-        double                  testArmijo;
-        double                  testWolfe;        
+        double                  armijoLineIntercept;
+        double                  armijoLineSlope;
+        double                  strongWolfeRHS;
+        unsigned int            numIterations;        
 };
 
 }
