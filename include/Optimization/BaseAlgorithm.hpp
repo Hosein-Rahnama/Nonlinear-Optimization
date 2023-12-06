@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <Optimization/LineSearch.hpp>
+#include <Optimization/LineSearchNocedal.hpp>
 
 
 namespace Optimization 
@@ -34,7 +34,7 @@ class BaseAlgorithm
                       double                  gradTol,
                       double                  relTol,
                       unsigned int            maxNumIterations,
-                      LineSearch::Ptr         lineSearch);
+                      LineSearch::Ptr         lineSearch = nullptr);
 
         virtual ~BaseAlgorithm();
 
@@ -60,7 +60,6 @@ class BaseAlgorithm
                                      const Eigen::VectorXd & gradient,
                                      const Eigen::VectorXd & lastParameters,
                                      const Eigen::VectorXd & lastGradient,
-                                     unsigned int            numIterations,
                                      Eigen::VectorXd &       direction) = 0;
 
         void evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
@@ -78,6 +77,7 @@ class BaseAlgorithm
 
         double                 gradTol;
         double                 relTol;
+        unsigned int           numIterations;
         unsigned int           maxNumIterations;
         unsigned int           numFuncEvaluations;
         
@@ -87,7 +87,6 @@ class BaseAlgorithm
         Function               decoratedObjFuncInfo;
 };
 
-std::ostream & operator<<(std::ostream & os,
-                          const Result & result);
+std::ostream & operator<<(std::ostream & os, const Result & result);
 
 }

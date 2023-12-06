@@ -18,17 +18,18 @@ BaseAlgorithm::BaseAlgorithm(const Function &        objFuncInfo,
 
     setGradientTol(gradTol);
     setRelativeTol(relTol);
+
+    numIterations = 0;
     setMaxNumIterations(maxNumIterations);
+
     numFuncEvaluations = 0;
-
-    setLineSearch(lineSearch);
-
     this->objFuncInfo = objFuncInfo;
     decoratedObjFuncInfo = std::bind(&BaseAlgorithm::evaluateObjFuncInfo, 
                                      this,
                                      std::placeholders::_1,
                                      std::placeholders::_2,
                                      std::placeholders::_3);
+    setLineSearch(lineSearch);
 }
 
 BaseAlgorithm::~BaseAlgorithm()
@@ -46,7 +47,6 @@ void BaseAlgorithm::solve(Result & result)
     double lastFuncValue;
     double gradNorm;
     double lastGradNorm;
-    unsigned int numIterations = 0;
     
     Eigen::VectorXd parameters = initialParameters;
     // Evaluate the function and its gradient.
@@ -56,7 +56,6 @@ void BaseAlgorithm::solve(Result & result)
     gradNorm = computeGradNorm(gradient);
     if (gradNorm <= gradTol)
     {
-        // Stop optimization.
         result.exitFlag           = Gradient;
         result.optParameters      = parameters;
         result.optFuncValue       = funcValue;
@@ -82,19 +81,16 @@ void BaseAlgorithm::solve(Result & result)
         
         // Search for an optimal step length. Try a step length of 1.0 first.
         double stepLength = 1.0;
+        const bool stepLengthFound = lineSearch->search(lastParameters,
+                                                        lastGradient,
+                                                        direction,
+                                                        parameters,
+                                                        funcValue,
+                                                        gradient,
+                                                        stepLength);
         
-        const bool ret = lineSearch->search(decoratedObjFuncInfo, 
-                                            lastParameters,
-                                            lastGradient,
-                                            direction,
-                                            parameters,
-                                            funcValue,
-                                            gradient,
-                                            stepLength);
-        
-        if (!ret)
+        if (!stepLengthFound)
         {
-            // Stop optimization with parameters from the last iteration.
             result.exitFlag           = LineSearchFailed;
             result.optParameters      = lastParameters;
             result.optFuncValue       = lastFuncValue;
@@ -109,7 +105,6 @@ void BaseAlgorithm::solve(Result & result)
         gradNorm = computeGradNorm(gradient);
         if (gradNorm <= gradTol)
         {
-            // Stop optimization.
             result.exitFlag           = Gradient;
             result.optParameters      = parameters;
             result.optFuncValue       = funcValue;
@@ -123,7 +118,6 @@ void BaseAlgorithm::solve(Result & result)
         // Relative convergence test.
         if (std::fabs(funcValue - lastFuncValue) <= relTol * std::fabs(funcValue))
         {
-            // Stop optimization.
             result.exitFlag           = Relative;
             result.optParameters      = parameters;
             result.optFuncValue       = funcValue;
@@ -137,7 +131,6 @@ void BaseAlgorithm::solve(Result & result)
         // Check for maximum number of allowed iterations.
         if (numIterations >= maxNumIterations)
         {
-            // Stop optimization.
             result.exitFlag           = MaxNumIterations;
             result.optParameters      = parameters;
             result.optFuncValue       = funcValue;
@@ -153,19 +146,20 @@ void BaseAlgorithm::solve(Result & result)
                         gradient,
                         lastParameters, 
                         lastGradient,
-                        numIterations, 
                         direction);
     }
 }
 
 void BaseAlgorithm::setLineSearch(LineSearch::Ptr lineSearch)
 {
-    if (!lineSearch) 
+    if (lineSearch == nullptr)
     {
-        throw std::invalid_argument("Invalid line search pointer.");
+        this->lineSearch = std::make_shared<LineSearchNocedal>(decoratedObjFuncInfo);
     }
-    
-    this->lineSearch = lineSearch;
+    else
+    {
+        this->lineSearch = lineSearch;
+    }
 }
 
 LineSearch::Ptr BaseAlgorithm::getLineSearch() const
@@ -224,8 +218,7 @@ void BaseAlgorithm::evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
     objFuncInfo(parameters, funcValue, gradient);
 }
 
-std::ostream & operator<<(std::ostream & os,
-                          const Result & result)
+std::ostream & operator<<(std::ostream & os, const Result & result)
 {
     os << "------------------------------- Result -------------------------------\n";
     os << "Exit flag                                 : ";

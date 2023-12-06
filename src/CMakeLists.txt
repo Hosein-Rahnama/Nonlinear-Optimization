@@ -1,5 +1,9 @@
 add_library(
-    ${LIBRARY_NAME} SteepestDescent.cpp BFGS.cpp LineSearchNocedal.cpp BaseAlgorithm.cpp
+    ${LIBRARY_NAME} BaseAlgorithm.cpp
+                    SteepestDescent.cpp 
+                    BFGS.cpp 
+                    LineSearch.cpp 
+                    LineSearchNocedal.cpp 
 )
 
 target_include_directories(

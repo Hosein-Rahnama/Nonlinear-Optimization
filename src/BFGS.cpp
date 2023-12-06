@@ -18,7 +18,7 @@ BFGS::BFGS(const Function &        objFuncInfo,
                          maxNumIterations,
                          lineSearch)
 {
-    
+
 }
 
 BFGS::~BFGS()
@@ -36,19 +36,18 @@ void BFGS::initialDirection(const Eigen::VectorXd & gradient,
     direction = -inverseHessian * gradient;
 }
 
+/*   
+ *  Implements the BFGS Algorithm 6.1 from
+ *  Jorge Nocedal and Stephen J. Wright, Numerical Optimization,
+ *  Springer, 2nd edition, 2006, Page 140
+ */
+
 void BFGS::updateDirection(const Eigen::VectorXd & parameters,
                            const Eigen::VectorXd & gradient,
                            const Eigen::VectorXd & lastParameters,
                            const Eigen::VectorXd & lastGradient,
-                           unsigned int            numIterations,
                            Eigen::VectorXd &       direction)
-{
-    /*   
-     *   Implements the BFGS algorithm from
-     *   Jorge Nocedal and Stephen J. Wright, Numerical Optimization,
-     *   Springer, 2nd edition, Springer, 2006, Page 177
-     */
-    
+{    
     // Update approximative inverse Hessian
     s = parameters - lastParameters;
     y = gradient - lastGradient;

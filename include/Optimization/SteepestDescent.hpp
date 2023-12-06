@@ -14,7 +14,7 @@ class SteepestDescent : public BaseAlgorithm
                         double                  gradTol = 1e-9,
                         double                  relTol = 1e-9,
                         unsigned int            maxNumIterations = 100000,
-                        LineSearch::Ptr         lineSearch = std::make_shared<LineSearchNocedal>());
+                        LineSearch::Ptr         lineSearch = nullptr);
         
         ~SteepestDescent();
         
@@ -30,7 +30,6 @@ class SteepestDescent : public BaseAlgorithm
                                     const Eigen::VectorXd & gradient,
                                     const Eigen::VectorXd & lastParameters,
                                     const Eigen::VectorXd & lastGradient,
-                                    unsigned int            numIterations,
                                     Eigen::VectorXd &       direction) override
         {
             direction = -1 * gradient;
