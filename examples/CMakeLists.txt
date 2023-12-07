@@ -1,6 +1,6 @@
-add_executable(MatrixMultiplication MatrixMultiplication.cpp)
+add_executable(LinearAlgebra LinearAlgebra.cpp)
 target_include_directories(
-    MatrixMultiplication
+    LinearAlgebra
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 

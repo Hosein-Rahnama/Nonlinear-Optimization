@@ -5,4 +5,9 @@ project(Nonlinear_Optimization)
 set(LIBRARY_NAME "Optimization")
 
 add_subdirectory(src)
-add_subdirectory(examples)
+
+option(BUILD_EXAMPLES "Whether to build examples" OFF)
+if (BUILD_EXAMPLES)
+    message(STATUS "BUILD_EXAMPLES ON")
+    add_subdirectory(examples)
+endif()

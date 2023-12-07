@@ -220,7 +220,7 @@ void BaseAlgorithm::evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
 
 std::ostream & operator<<(std::ostream & os, const Result & result)
 {
-    os << "------------------------------- Result -------------------------------\n";
+    os << "------------------------------------------ Result -------------------------------------------\n";
     os << "Exit flag                                 : ";
     
     if (result.exitFlag == Gradient) 
@@ -249,7 +249,7 @@ std::ostream & operator<<(std::ostream & os, const Result & result)
     os << "Gradient norm                             : " << result.optGradNorm << std::endl;
     os << "Number of iterations                      : " << result.numIterations << std::endl;
     os << "Number of function or gradient evaluations: " << result.numFuncEvaluations << std::endl;
-    os << "----------------------------------------------------------------------\n";
+    os << "---------------------------------------------------------------------------------------------\n";
     
     return os;
 }

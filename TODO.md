@@ -2,6 +2,8 @@
 
 The following is a list for future work.
 
-- [ ] Calculate number of function and gradient evaluations separately. This requires modifying `Function` type and its realted entities.
-- [ ] Improve `LineSearch` class.
-- [ ] Add backtracking line search.
+- [ ] Calculate number of function and gradient evaluations separately.
+- [ ] Improve the procedure for setting a line search algorithm associated with a direction algorithm.
+- [ ] Change structure of `LineSearch class and its children based on bracketing and zooming phases.
+- [ ] Improve coding style, including `const` variables of constructors, `inline` functions, namings, etc.
+- [ ] Create tests using CTest for the library.

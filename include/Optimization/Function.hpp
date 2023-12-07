@@ -10,8 +10,8 @@ namespace Optimization
 {
 
 typedef std::function<void(const Eigen::VectorXd & parameters,
-                      double &                funcValue,
-                      Eigen::VectorXd &       gradient)> Function;
+                           double &                funcValue,
+                           Eigen::VectorXd &       gradient)> Function;
 
 class ApproxDerivative 
 {

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cmake -S ../.. -B ..
+cmake -S ../.. -B .. -DBUILD_EXAMPLES=ON

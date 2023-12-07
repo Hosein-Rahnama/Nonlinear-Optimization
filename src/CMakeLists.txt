@@ -3,6 +3,7 @@ add_library(
                     SteepestDescent.cpp 
                     BFGS.cpp 
                     LineSearch.cpp 
+                    LineSearchBackTrack.cpp
                     LineSearchNocedal.cpp 
 )
 

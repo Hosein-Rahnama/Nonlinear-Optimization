@@ -51,6 +51,11 @@ class BaseAlgorithm
 
         void setRelativeTol(double relTol);
         double getRelativeTol() const;
+
+        Function getDecoratedObjFuncInfo() const
+        {
+            return decoratedObjFuncInfo;
+        }
         
     private:
         virtual void initialDirection(const Eigen::VectorXd & gradient,
