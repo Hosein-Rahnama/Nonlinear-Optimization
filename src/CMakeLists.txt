@@ -1,5 +1,6 @@
 add_library(
-    ${LIBRARY_NAME} BaseAlgorithm.cpp
+    ${LIBRARY_NAME} Function.cpp
+                    BaseAlgorithm.cpp
                     SteepestDescent.cpp 
                     BFGS.cpp 
                     LineSearch.cpp 

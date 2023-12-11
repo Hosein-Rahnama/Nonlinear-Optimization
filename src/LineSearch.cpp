@@ -6,10 +6,10 @@
 namespace Optimization 
 {
 
-LineSearch::LineSearch(Function &   decoratedObjFuncInfo,
+LineSearch::LineSearch(Function &   objFunc,
                        unsigned int maxNumIterations)
 { 
-    this->decoratedObjFuncInfo = &decoratedObjFuncInfo;
+    this->objFunc = &objFunc;
     setMaxNumIterations(maxNumIterations);
 }
 

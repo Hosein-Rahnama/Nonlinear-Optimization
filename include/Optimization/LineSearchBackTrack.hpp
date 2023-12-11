@@ -10,7 +10,7 @@ namespace Optimization
 class LineSearchBackTrack : public LineSearch 
 {
     public:
-        LineSearchBackTrack(Function &         decoratedObjFuncInfo,
+        LineSearchBackTrack(Function &         objFunc,
                             const double       armijoCoeff = 1e-4,
                             const double       contractionCoeff = 0.5,
                             const unsigned int maxNumIterations = 1000);
@@ -36,7 +36,8 @@ class LineSearchBackTrack : public LineSearch
                              Eigen::VectorXd & gradient) const 
         {
             parameters = (*initParameters) + stepLength * (*direction);
-            (*decoratedObjFuncInfo)(parameters, funcValue, gradient);
+            objFunc->calcObjFuncValue(parameters, funcValue);
+            objFunc->calcGrad(parameters, gradient);
 
             return;
         }

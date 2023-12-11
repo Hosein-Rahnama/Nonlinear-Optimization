@@ -4,14 +4,14 @@
 namespace Optimization 
 {
 
-SteepestDescent::SteepestDescent(const Function &        objFuncInfo,
+SteepestDescent::SteepestDescent(Function &              objFunc,
                                  const Eigen::VectorXd & initialParameters,
                                  double                  gradTol,
                                  double                  relTol,
                                  unsigned int            maxNumIterations,
                                  LineSearch::Ptr         lineSearch)
                                  :
-                                 BaseAlgorithm(objFuncInfo,
+                                 BaseAlgorithm(objFunc,
                                                initialParameters,
                                                gradTol,
                                                relTol,

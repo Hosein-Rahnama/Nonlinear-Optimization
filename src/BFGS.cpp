@@ -4,7 +4,7 @@
 namespace Optimization 
 {
 
-BFGS::BFGS(const Function &        objFuncInfo,
+BFGS::BFGS(Function &              objFuncInfo,
            const Eigen::VectorXd & initialParameters,
            double                  gradTol,
            double                  relTol,

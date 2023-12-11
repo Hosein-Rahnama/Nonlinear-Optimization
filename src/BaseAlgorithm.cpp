@@ -6,7 +6,7 @@
 namespace Optimization 
 {
 
-BaseAlgorithm::BaseAlgorithm(const Function &        objFuncInfo,
+BaseAlgorithm::BaseAlgorithm(Function &              objFunc,
                              const Eigen::VectorXd & initialParameters,
                              double                  gradTol,
                              double                  relTol,
@@ -22,13 +22,8 @@ BaseAlgorithm::BaseAlgorithm(const Function &        objFuncInfo,
     numIterations = 0;
     setMaxNumIterations(maxNumIterations);
 
-    numFuncEvaluations = 0;
-    this->objFuncInfo = objFuncInfo;
-    decoratedObjFuncInfo = std::bind(&BaseAlgorithm::evaluateObjFuncInfo, 
-                                     this,
-                                     std::placeholders::_1,
-                                     std::placeholders::_2,
-                                     std::placeholders::_3);
+    this->objFunc = (&objFunc);
+
     setLineSearch(lineSearch);
 }
 
@@ -49,8 +44,13 @@ void BaseAlgorithm::solve(Result & result)
     double lastGradNorm;
     
     Eigen::VectorXd parameters = initialParameters;
+
+    // Reset counters of function and gradient evaluations.
+    objFunc->resetNumEvaluations();
+
     // Evaluate the function and its gradient.
-    evaluateObjFuncInfo(parameters, funcValue, gradient);
+    objFunc->calcObjFuncValue(parameters, funcValue);
+    objFunc->calcGrad(parameters, gradient);
     
     // Ensure that the initial parameters are not a minimizer.
     gradNorm = computeGradNorm(gradient);
@@ -61,7 +61,8 @@ void BaseAlgorithm::solve(Result & result)
         result.optFuncValue       = funcValue;
         result.optGradNorm        = gradNorm;
         result.numIterations      = numIterations;
-        result.numFuncEvaluations = numFuncEvaluations;
+        result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
+        result.numGradEvaluations = objFunc->getNumGradEvaluations();
         
         return;
     }
@@ -96,7 +97,8 @@ void BaseAlgorithm::solve(Result & result)
             result.optFuncValue       = lastFuncValue;
             result.optGradNorm        = lastGradNorm;
             result.numIterations      = numIterations;
-            result.numFuncEvaluations = numFuncEvaluations;
+            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
+            result.numGradEvaluations = objFunc->getNumGradEvaluations();
             
             return;
         }
@@ -110,7 +112,8 @@ void BaseAlgorithm::solve(Result & result)
             result.optFuncValue       = funcValue;
             result.optGradNorm        = gradNorm;
             result.numIterations      = numIterations;
-            result.numFuncEvaluations = numFuncEvaluations;
+            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
+            result.numGradEvaluations = objFunc->getNumGradEvaluations();
             
             return;
         }
@@ -123,7 +126,8 @@ void BaseAlgorithm::solve(Result & result)
             result.optFuncValue       = funcValue;
             result.optGradNorm        = gradNorm;
             result.numIterations      = numIterations;
-            result.numFuncEvaluations = numFuncEvaluations;
+            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
+            result.numGradEvaluations = objFunc->getNumGradEvaluations();
             
             return;
         }
@@ -136,7 +140,8 @@ void BaseAlgorithm::solve(Result & result)
             result.optFuncValue       = funcValue;
             result.optGradNorm        = gradNorm;
             result.numIterations      = numIterations;
-            result.numFuncEvaluations = numFuncEvaluations;
+            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
+            result.numGradEvaluations = objFunc->getNumGradEvaluations();
 
             return;
         }
@@ -154,7 +159,7 @@ void BaseAlgorithm::setLineSearch(LineSearch::Ptr lineSearch)
 {
     if (lineSearch == nullptr)
     {
-        this->lineSearch = std::make_shared<LineSearchNocedal>(decoratedObjFuncInfo);
+        this->lineSearch = std::make_shared<LineSearchNocedal>(*objFunc);
     }
     else
     {
@@ -210,18 +215,10 @@ double BaseAlgorithm::getRelativeTol() const
     return relTol;
 }
 
-void BaseAlgorithm::evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
-                                        double &                funcValue,
-                                        Eigen::VectorXd &       gradient)
-{
-    numFuncEvaluations++;
-    objFuncInfo(parameters, funcValue, gradient);
-}
-
 std::ostream & operator<<(std::ostream & os, const Result & result)
 {
     os << "------------------------------------------ Result -------------------------------------------\n";
-    os << "Exit flag                                 : ";
+    os << "Exit flag                     : ";
     
     if (result.exitFlag == Gradient) 
     {
@@ -244,11 +241,12 @@ std::ostream & operator<<(std::ostream & os, const Result & result)
         os << "Unknown exit flag\n";
     }
     
-    os << "Optimal parameters                        : " << result.optParameters.transpose() << std::endl;
-    os << "Function value                            : " << result.optFuncValue << std::endl;
-    os << "Gradient norm                             : " << result.optGradNorm << std::endl;
-    os << "Number of iterations                      : " << result.numIterations << std::endl;
-    os << "Number of function or gradient evaluations: " << result.numFuncEvaluations << std::endl;
+    os << "Optimal parameters            : " << result.optParameters.transpose() << std::endl;
+    os << "Function value                : " << result.optFuncValue << std::endl;
+    os << "Gradient norm                 : " << result.optGradNorm << std::endl;
+    os << "Number of iterations          : " << result.numIterations << std::endl;
+    os << "Number of function evaluations: " << result.numFuncEvaluations << std::endl;
+    os << "Number of gradient evaluations: " << result.numGradEvaluations << std::endl;
     os << "---------------------------------------------------------------------------------------------\n";
     
     return os;

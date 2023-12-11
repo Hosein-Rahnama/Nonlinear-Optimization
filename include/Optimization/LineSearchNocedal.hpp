@@ -10,7 +10,7 @@ namespace Optimization
 class LineSearchNocedal : public LineSearch 
 {
     public:
-        LineSearchNocedal(Function &         decoratedObjFuncInfo,
+        LineSearchNocedal(Function &         objFunc,
                           const double       armijoCoeff = 1e-4,
                           const double       wolfeCoeff = 0.9,
                           const unsigned int maxNumIterations = 1000);
@@ -50,7 +50,8 @@ class LineSearchNocedal : public LineSearch
                                Eigen::VectorXd & gradient) const 
         {
             parameters = (*initParameters) + stepLength * (*direction);
-            (*decoratedObjFuncInfo)(parameters, funcValue, gradient);
+            objFunc->calcObjFuncValue(parameters, funcValue);
+            objFunc->calcGrad(parameters, gradient);
             const double gradDotDir = gradient.dot(*direction);
             
             return gradDotDir;

@@ -6,12 +6,12 @@
 namespace Optimization 
 {
 
-LineSearchNocedal::LineSearchNocedal(Function &         decoratedObjFuncInfo,
+LineSearchNocedal::LineSearchNocedal(Function &         objFunc,
                                      const double       armijoCoeff,
                                      const double       wolfeCoeff,
                                      const unsigned int maxNumIterations)
                                      :
-                                     LineSearch(decoratedObjFuncInfo,
+                                     LineSearch(objFunc,
                                                 maxNumIterations)
 {
     setCoefficients(armijoCoeff, wolfeCoeff);

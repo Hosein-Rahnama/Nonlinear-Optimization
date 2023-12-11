@@ -15,7 +15,7 @@ class LineSearch
         typedef std::shared_ptr<LineSearch> Ptr;
         
     public:
-        LineSearch(Function &   decoratedObjFuncInfo,
+        LineSearch(Function &   objFunc,
                    unsigned int maxNumIterations);
         
         virtual ~LineSearch() { }
@@ -37,7 +37,7 @@ class LineSearch
         unsigned int getMaxNumIterations() const;
 
     protected:
-        Function *   decoratedObjFuncInfo;
+        Function *   objFunc;
         unsigned int maxNumIterations;   
 };
 

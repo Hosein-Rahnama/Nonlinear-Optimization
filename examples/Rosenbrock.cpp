@@ -8,34 +8,27 @@
 using namespace Optimization;
 
 
-static double objFunc(const Eigen::VectorXd & parameters)
+void objFunc(const Eigen::VectorXd & parameters, double & funcValue)
 {
-    return 100 * std::pow(parameters(1) - std::pow(parameters(0), 2), 2) + std::pow(1 - parameters(0), 2);
+    funcValue = 100 * std::pow(parameters(1) - std::pow(parameters(0), 2), 2) + std::pow(1 - parameters(0), 2);
+
+    return;
 }
 
-static void objFuncInfoExactDerivative(const Eigen::VectorXd & parameters,
-                        double & funcValue,
-                        Eigen::VectorXd & gradient)
+void gradFunc(const Eigen::VectorXd & parameters,
+              Eigen::VectorXd & gradient)
 {   
-    funcValue = objFunc(parameters); 
     gradient(0) = -400 * (parameters(1) - std::pow(parameters(0), 2.0)) * parameters(0) - 2 * (1 - parameters(0));
     gradient(1) = 200 * (parameters(1) - std::pow(parameters(0), 2.0));
-}
 
-class ObjFuncApproxDerivative : public Optimization::ApproxDerivative 
-{
-    public:
-        double objectiveFunction(const Eigen::VectorXd & parameters) override 
-        {
-            return objFunc(parameters);
-        }      
-};
+    return;
+}
 
 int main()
 {
     std::shared_ptr<BaseAlgorithm> algorithm;
-    Function decoratedObjFuncInfo;
-    ObjFuncApproxDerivative objFuncInfoApproxDerivative;
+    Function objFuncInfoExactDerivative(objFunc, gradFunc);
+    Function objFuncInfoApproxDerivative(objFunc);
     const Eigen::Vector2d initialParameters(-5, 10);
     Result result;
 
@@ -61,32 +54,28 @@ int main()
 
     // Steepest Descent, Backtracking Line Search, Exact Derivative
     algorithm = std::make_shared<SteepestDescent>(objFuncInfoExactDerivative, initialParameters);
-    decoratedObjFuncInfo = algorithm->getDecoratedObjFuncInfo();
-    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(decoratedObjFuncInfo));
+    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoExactDerivative));
     algorithm->solve(result);
     std::cout << "--------------- Steepest Descent, Backtracking Line Search, Exact Derivative ----------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // BFGS, Backtracking Line Search, Exact Derivative
     algorithm = std::make_shared<BFGS>(objFuncInfoExactDerivative, initialParameters);
-    decoratedObjFuncInfo = algorithm->getDecoratedObjFuncInfo();
-    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(decoratedObjFuncInfo));
+    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoExactDerivative));
     algorithm->solve(result);
     std::cout << "--------------------- BFGS, Backtracking Line Search, Exact Derivative ----------------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // Steepest Descent, Backtracking Line Search, Approximate Derivative
     algorithm = std::make_shared<SteepestDescent>(objFuncInfoApproxDerivative, initialParameters);
-    decoratedObjFuncInfo = algorithm->getDecoratedObjFuncInfo();
-    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(decoratedObjFuncInfo));
+    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoApproxDerivative));
     algorithm->solve(result);
     std::cout << "------------ Steepest Descent, Backtracking Line Search, Approximate Derivative -------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // BFGS, Backtracking Line Search, Approximate Derivative
     algorithm = std::make_shared<BFGS>(objFuncInfoApproxDerivative, initialParameters);
-    decoratedObjFuncInfo = algorithm->getDecoratedObjFuncInfo();
-    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(decoratedObjFuncInfo));
+    algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoApproxDerivative));
     algorithm->solve(result);
     std::cout << "------------------ BFGS, Backtracking Line Search, Approximate Derivative -------------------" << std::endl;
     std::cout << result << std::endl << std::endl;

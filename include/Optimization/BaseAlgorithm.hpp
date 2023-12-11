@@ -3,6 +3,7 @@
 #include <string>
 
 #include <Optimization/LineSearchNocedal.hpp>
+#include <Optimization/LineSearchBackTrack.hpp>
 
 
 namespace Optimization 
@@ -24,12 +25,13 @@ struct Result
     double          optGradNorm;
     unsigned int    numIterations;
     unsigned int    numFuncEvaluations;
+    unsigned int    numGradEvaluations;
 };
 
 class BaseAlgorithm 
 {
     public:
-        BaseAlgorithm(const Function &        objFuncInfo,
+        BaseAlgorithm(Function &              objFunc,
                       const Eigen::VectorXd & initialParameters,
                       double                  gradTol,
                       double                  relTol,
@@ -51,11 +53,6 @@ class BaseAlgorithm
 
         void setRelativeTol(double relTol);
         double getRelativeTol() const;
-
-        Function getDecoratedObjFuncInfo() const
-        {
-            return decoratedObjFuncInfo;
-        }
         
     private:
         virtual void initialDirection(const Eigen::VectorXd & gradient,
@@ -66,10 +63,6 @@ class BaseAlgorithm
                                      const Eigen::VectorXd & lastParameters,
                                      const Eigen::VectorXd & lastGradient,
                                      Eigen::VectorXd &       direction) = 0;
-
-        void evaluateObjFuncInfo(const Eigen::VectorXd & parameters,
-                                 double &                funcValue,
-                                 Eigen::VectorXd &       gradient);
 
         static inline double computeGradNorm(const Eigen::VectorXd & gradient) 
         {
@@ -84,12 +77,10 @@ class BaseAlgorithm
         double                 relTol;
         unsigned int           numIterations;
         unsigned int           maxNumIterations;
-        unsigned int           numFuncEvaluations;
         
         LineSearch::Ptr        lineSearch;
 
-        Function               objFuncInfo;
-        Function               decoratedObjFuncInfo;
+        Function *             objFunc;
 };
 
 std::ostream & operator<<(std::ostream & os, const Result & result);

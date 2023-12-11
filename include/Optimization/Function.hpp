@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <cfloat>
 
 #include <Eigen/Dense>
@@ -9,44 +8,61 @@
 namespace Optimization 
 {
 
-typedef std::function<void(const Eigen::VectorXd & parameters,
-                           double &                funcValue,
-                           Eigen::VectorXd &       gradient)> Function;
-
-class ApproxDerivative 
+class Function 
 {
     public:
-        ApproxDerivative() { }
+        typedef void (* Value)(const Eigen::VectorXd & parameters, double & objFuncValue);
+        typedef void (* Gradient)(const Eigen::VectorXd & parameters, Eigen::VectorXd & gradValue);
+
+    public:
+        Function(Value objFunc, Gradient gradFunc = nullptr);
         
-        virtual ~ApproxDerivative() { }
-        
-        void operator()(const Eigen::VectorXd & parameters,
-                        double &                funcValue,
-                        Eigen::VectorXd &       gradient)
+        virtual ~Function() { }
+
+        void calcObjFuncValue(const Eigen::VectorXd & parameters,
+                              double & objFuncValue);
+
+        inline void calcGrad(const Eigen::VectorXd & parameters,
+                             Eigen::VectorXd &       gradValue)
         {
-            const Eigen::VectorXd::Index numParameters = parameters.size();
-            const double epsilon = std::sqrt(DBL_EPSILON);
-            const double invEpsilon = 1.0 / epsilon;
-            funcValue = objectiveFunction(parameters);
-            
-            gradParameters = parameters;
-            for (Eigen::VectorXd::Index i = 0;  i < numParameters; ++i)
+            if (this->gradFunc == nullptr)
             {
-                // Compute gradient with forward difference.
-                gradParameters(i) += epsilon;
-                const double value = objectiveFunction(gradParameters);
-                gradient(i) = (value - funcValue) * invEpsilon;
-                
-                // Restore original parameter.
-                gradParameters(i) = parameters(i);
+                calcApproxGrad(parameters, gradValue);
+            }
+            else
+            {
+                calcExactGrad(parameters, gradValue);
             }
         }
-        
-    protected:
-        virtual double objectiveFunction(const Eigen::VectorXd & parameters) = 0;
-        
+
+        inline unsigned int getNumFuncEvaluations() const
+        {
+            return numFuncEvaluations;
+        }
+
+        inline unsigned int getNumGradEvaluations() const
+        {
+            return numGradEvaluations;
+        }
+
+        inline void resetNumEvaluations()
+        {
+            numFuncEvaluations = 0;
+            numGradEvaluations = 0;
+        }
+
     private:
-        Eigen::VectorXd gradParameters;      
+        void calcExactGrad(const Eigen::VectorXd & parameters,
+                           Eigen::VectorXd &       gradValue);
+
+        void calcApproxGrad(const Eigen::VectorXd & parameters,
+                            Eigen::VectorXd &       gradValue);
+    
+    private:
+        Value objFunc;
+        Gradient gradFunc;
+        unsigned int numFuncEvaluations;
+        unsigned int numGradEvaluations;
 };
 
 }

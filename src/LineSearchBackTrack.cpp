@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 
 #include <Optimization/LineSearchBackTrack.hpp>
 
@@ -6,12 +7,12 @@
 namespace Optimization 
 {
 
-LineSearchBackTrack::LineSearchBackTrack(Function &         decoratedObjFuncInfo,
+LineSearchBackTrack::LineSearchBackTrack(Function &         objFunc,
                                          const double       armijoCoeff,
                                          const double       contractionCoeff,
                                          const unsigned int maxNumIterations)
                                          :
-                                         LineSearch(decoratedObjFuncInfo,
+                                         LineSearch(objFunc,
                                                     maxNumIterations)
 {
     setCoefficients(armijoCoeff, contractionCoeff);
@@ -63,10 +64,11 @@ bool LineSearchBackTrack::search(const Eigen::VectorXd & initParameters,
         if (stepLength < DBL_EPSILON) 
         {
             // Current step length is too small.
+            std::cout << "Step length too small" << std::endl;
             return false;
         }
 
-        // Evaluate the function and its gradient values.
+        // Evaluate the function values.
         evaluate(stepLength, parameters, funcValue, gradient);
         
         if (checkArmijo(stepLength, funcValue)) 

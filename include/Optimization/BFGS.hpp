@@ -9,7 +9,7 @@ namespace Optimization
 class BFGS : public BaseAlgorithm 
 {
     public:
-        BFGS(const Function &        objFuncInfo,
+        BFGS(Function &              objFuncInfo,
              const Eigen::VectorXd & initialParameters,
              double                  gradTol = 1e-9,
              double                  relTol = 1e-9,
