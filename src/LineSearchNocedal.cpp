@@ -62,14 +62,13 @@ bool LineSearchNocedal::search(const Eigen::VectorXd & initParameters,
     
     while (true) 
     {        
-        // Evaluate the function and its gradient values.
-        const double gradDotDir = evaluate(stepLength, parameters, funcValue, gradient);
-        
+        evalFunc(stepLength, parameters, funcValue);
         if (!checkArmijo(stepLength, funcValue) || funcValue >= lastFuncValue) 
         {
             return zoom(lastStepLength, stepLength, lastFuncValue, parameters, funcValue, gradient, stepLength);
         }
         
+        const double gradDotDir = evalGrad(stepLength, parameters, gradient);
         if (checkStrongWolfe(gradDotDir)) 
         {
             // Line search was successful.
@@ -123,9 +122,7 @@ bool LineSearchNocedal::zoom(double            stepLengthLow,
         // Bisect current step length interval.
         stepLength = 0.5 * (stepLengthLow + stepLengthHigh);
         
-        // Evaluate the function and gradient values.
-        const double gradDotDir = evaluate(stepLength, parameters, funcValue, gradient);
-        
+        evalFunc(stepLength, parameters, funcValue);
         if (!checkArmijo(stepLength, funcValue) || funcValue >= funcValueLow) 
         {
             // Change upper bound.
@@ -133,6 +130,7 @@ bool LineSearchNocedal::zoom(double            stepLengthLow,
         } 
         else 
         {
+            const double gradDotDir = evalGrad(stepLength, parameters, gradient);
             if (checkStrongWolfe(gradDotDir)) 
             {
                 // Line search was successful.

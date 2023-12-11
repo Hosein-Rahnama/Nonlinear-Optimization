@@ -34,50 +34,50 @@ int main()
 
     // Steepest Descent, Nocedal Line Search, Exact Derivative
     SteepestDescent(objFuncInfoExactDerivative, initialParameters).solve(result);
-    std::cout << "---------------- Steepest Descent, Nocedal Line Search, Exact Derivative --------------------" << std::endl;
+    std::cout << "------------- Steepest Descent, Nocedal Line Search, Exact Derivative ------------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // BFGS, Nocedal Line Search, Exact Derivative
     BFGS(objFuncInfoExactDerivative, initialParameters).solve(result);
-    std::cout << "---------------------- BFGS, Nocedal Line Search, Exact Derivative --------------------------" << std::endl;
+    std::cout << "------------------- BFGS, Nocedal Line Search, Exact Derivative ------------------------" << std::endl;
     std::cout << result << std::endl << std::endl;
     
     // Steepest Descent, Nocedal Line Search, Approximate Derivative
     SteepestDescent(objFuncInfoApproxDerivative, initialParameters).solve(result);
-    std::cout << "-------------- Steepest Descent, Nocedal Line Search, Approximate Derivative ----------------" << std::endl;
+    std::cout << "----------- Steepest Descent, Nocedal Line Search, Approximate Derivative --------------" << std::endl;
     std::cout << result << std::endl << std::endl;
     
     // BFGS, Nocedal Line Search, Approximate Derivative
     BFGS(objFuncInfoApproxDerivative, initialParameters).solve(result);
-    std::cout << "-------------------- BFGS, Nocedal Line Search, Approximate Derivative ----------------------" << std::endl;
+    std::cout << "----------------- BFGS, Nocedal Line Search, Approximate Derivative --------------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // Steepest Descent, Backtracking Line Search, Exact Derivative
     algorithm = std::make_shared<SteepestDescent>(objFuncInfoExactDerivative, initialParameters);
     algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoExactDerivative));
     algorithm->solve(result);
-    std::cout << "--------------- Steepest Descent, Backtracking Line Search, Exact Derivative ----------------" << std::endl;
+    std::cout << "------------ Steepest Descent, Backtracking Line Search, Exact Derivative --------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // BFGS, Backtracking Line Search, Exact Derivative
     algorithm = std::make_shared<BFGS>(objFuncInfoExactDerivative, initialParameters);
     algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoExactDerivative));
     algorithm->solve(result);
-    std::cout << "--------------------- BFGS, Backtracking Line Search, Exact Derivative ----------------------" << std::endl;
+    std::cout << "------------------ BFGS, Backtracking Line Search, Exact Derivative --------------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // Steepest Descent, Backtracking Line Search, Approximate Derivative
     algorithm = std::make_shared<SteepestDescent>(objFuncInfoApproxDerivative, initialParameters);
     algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoApproxDerivative));
     algorithm->solve(result);
-    std::cout << "------------ Steepest Descent, Backtracking Line Search, Approximate Derivative -------------" << std::endl;
+    std::cout << "--------- Steepest Descent, Backtracking Line Search, Approximate Derivative -----------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     // BFGS, Backtracking Line Search, Approximate Derivative
     algorithm = std::make_shared<BFGS>(objFuncInfoApproxDerivative, initialParameters);
     algorithm->setLineSearch(std::make_shared<LineSearchBackTrack>(objFuncInfoApproxDerivative));
     algorithm->solve(result);
-    std::cout << "------------------ BFGS, Backtracking Line Search, Approximate Derivative -------------------" << std::endl;
+    std::cout << "--------------- BFGS, Backtracking Line Search, Approximate Derivative -----------------" << std::endl;
     std::cout << result << std::endl << std::endl;
 
     return 0;

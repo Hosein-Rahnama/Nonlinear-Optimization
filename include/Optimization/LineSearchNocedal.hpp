@@ -43,14 +43,22 @@ class LineSearchNocedal : public LineSearch
                   double &          funcValue,
                   Eigen::VectorXd & gradient,
                   double &          stepLength);
-        
-        inline double evaluate(double            stepLength,
-                               Eigen::VectorXd & parameters,
-                               double &          funcValue,
-                               Eigen::VectorXd & gradient) const 
+
+        inline void evalFunc(double & stepLength,
+                             Eigen::VectorXd & parameters,
+                             double & funcValue)
         {
             parameters = (*initParameters) + stepLength * (*direction);
             objFunc->calcObjFuncValue(parameters, funcValue);
+
+            return;
+        }
+
+        inline double evalGrad(double &          stepLength,
+                               Eigen::VectorXd & parameters,
+                               Eigen::VectorXd & gradient) const 
+        {
+            parameters = (*initParameters) + stepLength * (*direction);
             objFunc->calcGrad(parameters, gradient);
             const double gradDotDir = gradient.dot(*direction);
             

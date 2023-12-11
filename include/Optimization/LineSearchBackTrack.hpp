@@ -30,14 +30,12 @@ class LineSearchBackTrack : public LineSearch
         double getContractionCoeff() const;
         
     private:        
-        inline void evaluate(double            stepLength,
+        inline void evalFunc(double            stepLength,
                              Eigen::VectorXd & parameters,
-                             double &          funcValue,
-                             Eigen::VectorXd & gradient) const 
+                             double &          funcValue) const 
         {
             parameters = (*initParameters) + stepLength * (*direction);
             objFunc->calcObjFuncValue(parameters, funcValue);
-            objFunc->calcGrad(parameters, gradient);
 
             return;
         }

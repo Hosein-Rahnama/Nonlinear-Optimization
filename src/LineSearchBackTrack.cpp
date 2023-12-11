@@ -64,15 +64,13 @@ bool LineSearchBackTrack::search(const Eigen::VectorXd & initParameters,
         if (stepLength < DBL_EPSILON) 
         {
             // Current step length is too small.
-            std::cout << "Step length too small" << std::endl;
             return false;
         }
 
-        // Evaluate the function values.
-        evaluate(stepLength, parameters, funcValue, gradient);
-        
+        evalFunc(stepLength, parameters, funcValue);
         if (checkArmijo(stepLength, funcValue)) 
         {
+            objFunc->calcGrad(parameters, gradient);
             return true;
         }
         
