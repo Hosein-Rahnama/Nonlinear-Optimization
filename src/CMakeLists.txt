@@ -5,7 +5,8 @@ add_library(
                     BFGS.cpp 
                     LineSearch.cpp 
                     LineSearchBackTrack.cpp
-                    LineSearchNocedal.cpp 
+                    LineSearchNocedal.cpp
+                    Result.cpp
 )
 
 target_include_directories(

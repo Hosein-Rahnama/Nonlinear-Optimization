@@ -4,29 +4,11 @@
 
 #include <Optimization/LineSearchNocedal.hpp>
 #include <Optimization/LineSearchBackTrack.hpp>
+#include <Optimization/Result.hpp>
 
 
 namespace Optimization 
 {
-
-enum ExitFlag 
-{
-     Gradient,
-     Relative,
-     LineSearchFailed,
-     MaxNumIterations
-};
-
-struct Result 
-{
-    ExitFlag        exitFlag;
-    Eigen::VectorXd optParameters;
-    double          optFuncValue;
-    double          optGradNorm;
-    unsigned int    numIterations;
-    unsigned int    numFuncEvaluations;
-    unsigned int    numGradEvaluations;
-};
 
 class BaseAlgorithm 
 {
@@ -82,7 +64,5 @@ class BaseAlgorithm
 
         Function *             objFunc;
 };
-
-std::ostream & operator<<(std::ostream & os, const Result & result);
 
 }

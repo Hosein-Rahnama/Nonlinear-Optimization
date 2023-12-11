@@ -56,14 +56,8 @@ void BaseAlgorithm::solve(Result & result)
     gradNorm = computeGradNorm(gradient);
     if (gradNorm <= gradTol)
     {
-        result.exitFlag           = Gradient;
-        result.optParameters      = parameters;
-        result.optFuncValue       = funcValue;
-        result.optGradNorm        = gradNorm;
-        result.numIterations      = numIterations;
-        result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
-        result.numGradEvaluations = objFunc->getNumGradEvaluations();
-        
+        result.set(Gradient, parameters, funcValue, gradNorm, numIterations, 
+                   objFunc->getNumFuncEvaluations(), objFunc->getNumGradEvaluations());
         return;
     }
     
@@ -92,14 +86,8 @@ void BaseAlgorithm::solve(Result & result)
         
         if (!stepLengthFound)
         {
-            result.exitFlag           = LineSearchFailed;
-            result.optParameters      = lastParameters;
-            result.optFuncValue       = lastFuncValue;
-            result.optGradNorm        = lastGradNorm;
-            result.numIterations      = numIterations;
-            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
-            result.numGradEvaluations = objFunc->getNumGradEvaluations();
-            
+            result.set(LineSearchFailed, lastParameters, lastFuncValue, lastGradNorm, numIterations, 
+                       objFunc->getNumFuncEvaluations(), objFunc->getNumGradEvaluations());
             return;
         }
         
@@ -107,42 +95,24 @@ void BaseAlgorithm::solve(Result & result)
         gradNorm = computeGradNorm(gradient);
         if (gradNorm <= gradTol)
         {
-            result.exitFlag           = Gradient;
-            result.optParameters      = parameters;
-            result.optFuncValue       = funcValue;
-            result.optGradNorm        = gradNorm;
-            result.numIterations      = numIterations;
-            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
-            result.numGradEvaluations = objFunc->getNumGradEvaluations();
-            
+            result.set(Gradient, parameters, funcValue, gradNorm, numIterations, 
+                       objFunc->getNumFuncEvaluations(), objFunc->getNumGradEvaluations());
             return;
         }
         
         // Relative convergence test.
         if (std::fabs(funcValue - lastFuncValue) <= relTol * std::fabs(funcValue))
         {
-            result.exitFlag           = Relative;
-            result.optParameters      = parameters;
-            result.optFuncValue       = funcValue;
-            result.optGradNorm        = gradNorm;
-            result.numIterations      = numIterations;
-            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
-            result.numGradEvaluations = objFunc->getNumGradEvaluations();
-            
+            result.set(Relative, parameters, funcValue, gradNorm, numIterations, 
+                       objFunc->getNumFuncEvaluations(), objFunc->getNumGradEvaluations());
             return;
         }
         
         // Check for maximum number of allowed iterations.
         if (numIterations >= maxNumIterations)
         {
-            result.exitFlag           = MaxNumIterations;
-            result.optParameters      = parameters;
-            result.optFuncValue       = funcValue;
-            result.optGradNorm        = gradNorm;
-            result.numIterations      = numIterations;
-            result.numFuncEvaluations = objFunc->getNumFuncEvaluations();
-            result.numGradEvaluations = objFunc->getNumGradEvaluations();
-
+            result.set(MaxNumIterations, parameters, funcValue, gradNorm, numIterations, 
+                       objFunc->getNumFuncEvaluations(), objFunc->getNumGradEvaluations());
             return;
         }
         
@@ -213,43 +183,6 @@ void BaseAlgorithm::setRelativeTol(double relTol)
 double BaseAlgorithm::getRelativeTol() const
 {
     return relTol;
-}
-
-std::ostream & operator<<(std::ostream & os, const Result & result)
-{
-    os << "------------------------------------------ Result -------------------------------------------\n";
-    os << "Exit flag                     : ";
-    
-    if (result.exitFlag == Gradient) 
-    {
-        os << "Reached gradient tolerance\n";
-    } 
-    else if (result.exitFlag == Relative) 
-    {
-        os << "Reached relative tolerance\n";
-    } 
-    else if (result.exitFlag == MaxNumIterations) 
-    {
-        os << "Reached maximum number of allowed iterations\n";
-    } 
-    else if (result.exitFlag == LineSearchFailed) 
-    {
-        os << "Line search failed\n";
-    } 
-    else 
-    {
-        os << "Unknown exit flag\n";
-    }
-    
-    os << "Optimal parameters            : " << result.optParameters.transpose() << std::endl;
-    os << "Function value                : " << result.optFuncValue << std::endl;
-    os << "Gradient norm                 : " << result.optGradNorm << std::endl;
-    os << "Number of iterations          : " << result.numIterations << std::endl;
-    os << "Number of function evaluations: " << result.numFuncEvaluations << std::endl;
-    os << "Number of gradient evaluations: " << result.numGradEvaluations << std::endl;
-    os << "---------------------------------------------------------------------------------------------\n";
-    
-    return os;
 }
 
 }
