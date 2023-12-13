@@ -9,7 +9,7 @@ namespace Optimization
 class SteepestDescent : public BaseAlgorithm 
 {
     public:
-        SteepestDescent(Function &        objFunc,
+        SteepestDescent(Function &              objFunc,
                         const Eigen::VectorXd & initialParameters,
                         double                  gradTol = 1e-9,
                         double                  relTol = 1e-9,

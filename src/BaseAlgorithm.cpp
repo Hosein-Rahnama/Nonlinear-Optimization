@@ -34,17 +34,18 @@ BaseAlgorithm::~BaseAlgorithm()
 
 void BaseAlgorithm::solve(Result & result)
 {
+    Eigen::VectorXd parameters = initialParameters;
+    double funcValue;
     Eigen::VectorXd gradient(numParameters);
     Eigen::VectorXd direction(numParameters);
-    Eigen::VectorXd lastParameters(numParameters);
-    Eigen::VectorXd lastGradient(numParameters);
-    double funcValue;
-    double lastFuncValue;
-    double gradNorm;
     double lastGradNorm;
-    
-    Eigen::VectorXd parameters = initialParameters;
 
+    Eigen::VectorXd lastParameters(numParameters);
+    double lastFuncValue;
+    Eigen::VectorXd lastGradient(numParameters);
+    Eigen::VectorXd lastDirection(numParameters);
+    double gradNorm;
+    
     // Reset counters of function and gradient evaluations.
     objFunc->resetNumEvaluations();
 
@@ -63,19 +64,20 @@ void BaseAlgorithm::solve(Result & result)
     
     // Compute the initial direction.
     initialDirection(gradient, direction);
+
+    double stepLength = 1.0;
     
     while (true)
     {
         ++numIterations;
-        
-        // Store the current parameter and gradient vectors.
+
         lastParameters = parameters;
-        lastGradient   = gradient;
         lastFuncValue  = funcValue;
+        lastGradient   = gradient;
+        lastDirection  = direction;
         lastGradNorm   = gradNorm;
         
-        // Search for an optimal step length. Try a step length of 1.0 first.
-        double stepLength = 1.0;
+        // Search for an optimal step length.
         const bool stepLengthFound = lineSearch->search(lastParameters,
                                                         lastGradient,
                                                         direction,
@@ -122,6 +124,9 @@ void BaseAlgorithm::solve(Result & result)
                         lastParameters, 
                         lastGradient,
                         direction);
+
+        // Update trial step length
+        stepLength = std::min(1.0, 1.01 * 2 * (funcValue - lastFuncValue) / (lastGradient.dot(lastDirection)));
     }
 }
 

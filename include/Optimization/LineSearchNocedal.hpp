@@ -31,7 +31,8 @@ class LineSearchNocedal : public LineSearch
          *  The wolfeCoeff must be in (armijoCoeff, 1). The default value is 0.9.
          */
         
-        void setCoefficients(double armijoCoeff, double wolfeCoeff);
+        void setCoefficients(double armijoCoeff, 
+                             double wolfeCoeff);
         double getArmijoCoeff() const;
         double getWolfeCoeff() const;
         

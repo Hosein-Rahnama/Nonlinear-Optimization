@@ -19,7 +19,7 @@ void Function::calcObjFuncValue(const Eigen::VectorXd & parameters,
 }
 
 void Function::calcExactGrad(const Eigen::VectorXd & parameters,
-                             Eigen::VectorXd & gradValue)
+                             Eigen::VectorXd &       gradValue)
 {
     numGradEvaluations++;
     gradFunc(parameters, gradValue);

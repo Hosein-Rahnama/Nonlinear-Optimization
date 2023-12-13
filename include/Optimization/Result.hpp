@@ -36,7 +36,8 @@ class Result
             this->numGradEvaluations = numGradEvaluations;
         }
 
-        friend std::ostream & operator<<(std::ostream & out, const Result & result);
+        friend std::ostream & operator<<(std::ostream & out, 
+                                         const Result & result);
 
     private:
         ExitFlag        exitFlag;

@@ -153,7 +153,8 @@ bool LineSearchNocedal::zoom(double            stepLengthLow,
     }
 }
 
-void LineSearchNocedal::setCoefficients(double armijoCoeff, double wolfeCoeff)
+void LineSearchNocedal::setCoefficients(double armijoCoeff, 
+                                        double wolfeCoeff)
 {
     if (armijoCoeff <= 0.0 || armijoCoeff >= 1.0) 
     {

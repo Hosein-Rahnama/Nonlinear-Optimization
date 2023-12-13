@@ -3,7 +3,8 @@
 namespace Optimization
 {
 
-std::ostream & operator<<(std::ostream & out, const Result & result)
+std::ostream & operator<<(std::ostream & out, 
+                          const Result & result)
 {
     out << "---------------------------------------- Result ----------------------------------------\n";
     out << "               Exit flag                     : ";
