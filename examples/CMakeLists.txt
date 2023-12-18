@@ -18,3 +18,10 @@ target_link_libraries(
     ${EXAMPLE}
     PRIVATE ${LIBRARY_NAME}
 )
+
+set(EXAMPLE "Trigonometric")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
+target_link_libraries(
+    ${EXAMPLE}
+    PRIVATE ${LIBRARY_NAME}
+)
