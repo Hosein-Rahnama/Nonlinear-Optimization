@@ -1,11 +1,20 @@
-add_executable(LinearAlgebra LinearAlgebra.cpp)
+set(EXAMPLE "LinearAlgebra")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
 target_include_directories(
-    LinearAlgebra
+    ${EXAMPLE}
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 
-add_executable(Rosenbrock Rosenbrock.cpp)
+set(EXAMPLE "Rosenbrock")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
 target_link_libraries(
-    Rosenbrock
+    ${EXAMPLE}
+    PRIVATE ${LIBRARY_NAME}
+)
+
+set(EXAMPLE "Quadratic")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
+target_link_libraries(
+    ${EXAMPLE}
     PRIVATE ${LIBRARY_NAME}
 )

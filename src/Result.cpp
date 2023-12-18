@@ -30,12 +30,18 @@ std::ostream & operator<<(std::ostream & out,
         out << "Unknown exit flag\n";
     }
     
-    out << "               Optimal parameters            : " << result.optParameters.transpose() << std::endl;
-    out << "               Function value                : " << result.optFuncValue << std::endl;
     out << "               Gradient norm                 : " << result.optGradNorm << std::endl;
     out << "               Number of iterations          : " << result.numIterations << std::endl;
     out << "               Number of function evaluations: " << result.numFuncEvaluations << std::endl;
     out << "               Number of gradient evaluations: " << result.numGradEvaluations << std::endl;
+    out << "               Function value                : " << result.optFuncValue << std::endl;
+    out << "               Optimal parameters            : ";
+    int n = result.optParameters.size();
+    for (int i = 0; i < n; i++)
+    {
+        out << result.optParameters(i) << ((i == n - 1) ? "" : ", ");
+    }
+    out << std::endl;
     out << "----------------------------------------------------------------------------------------\n";
     
     return out;
