@@ -39,6 +39,10 @@ std::ostream & operator<<(std::ostream & out,
     int n = result.optParameters.size();
     for (int i = 0; i < n; i++)
     {
+        if (i % 4 == 0 && i > 0)
+        {
+            out << std::endl << "                                               ";
+        }
         out << result.optParameters(i) << ((i == n - 1) ? "" : ", ");
     }
     out << std::endl;
