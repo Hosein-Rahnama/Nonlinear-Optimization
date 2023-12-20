@@ -88,7 +88,7 @@ int main()
     std::shared_ptr<BaseAlgorithm> algorithm;
     Function objFuncInfoExactDerivative(objFunc, gradFunc);
     Function objFuncInfoApproxDerivative(objFunc);
-    const Eigen::VectorXd initialParameters = Eigen::VectorXd::Constant(n, 1.0/n);
+    Eigen::VectorXd initialParameters = Eigen::VectorXd::Constant(n, 1.0/n);
     Result result;
 
     // Steepest Descent, Nocedal Line Search, Exact Derivative

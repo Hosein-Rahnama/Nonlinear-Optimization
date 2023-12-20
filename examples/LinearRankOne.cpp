@@ -8,18 +8,77 @@
 using namespace Optimization;
 
 
-void objFunc(const Eigen::VectorXd & parameters, double & funcValue)
+/* 
+ *  See item (33) in Section 3 of the following paper for the definition of Linear function - rank 1.
+ *
+ *  Moré, J. J., Garbow, B. S., Hillstrom, K. E. (1981). Testing unconstrained optimization software.
+ *  ACM Transactions on Mathematical Software (TOMS), 7(1), 17-41.
+ */
+
+
+const int n = 5;
+const int m = 10;
+
+int kroneckerDelta(int i, int j)
 {
-    funcValue = 100 * std::pow(parameters(1) - std::pow(parameters(0), 2), 2) + std::pow(1 - parameters(0), 2);
+    if (i == j)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void objFuncPart(const Eigen::VectorXd & parameters, Eigen::VectorXd & objFuncPartValue)
+{
+    double sumParameters = 0;
+    for (int j = 0; j < n; j++)
+    {
+        sumParameters += (j + 1) * parameters(j);
+    }
+    for (int i = 0; i < m; i++)
+    {
+        objFuncPartValue(i) = (i + 1) * sumParameters - 1;
+    }
 
     return;
 }
 
-void gradFunc(const Eigen::VectorXd & parameters,
-              Eigen::VectorXd & gradient)
+void gradFuncPart(const Eigen::VectorXd & parameters, Eigen::MatrixXd & gradFuncPartValue)
+{
+    for (int j = 0; j < n; j++)
+    {
+        for (int i = 0; i < m; i++)
+        {
+            gradFuncPartValue(i, j) = (i + 1) * (j + 1);
+        }
+    }
+
+    return;
+}
+
+void objFunc(const Eigen::VectorXd & parameters, double & funcValue)
+{
+    Eigen::VectorXd objFuncPartValue(m);
+
+    objFuncPart(parameters, objFuncPartValue);
+    funcValue = 0;
+    for (int i = 0; i < m; i++)
+    {
+        funcValue += std::pow(objFuncPartValue(i), 2);
+    }
+
+    return;
+}
+
+void gradFunc(const Eigen::VectorXd & parameters, Eigen::VectorXd & gradient)
 {   
-    gradient(0) = -400 * (parameters(1) - std::pow(parameters(0), 2.0)) * parameters(0) - 2 * (1 - parameters(0));
-    gradient(1) = 200 * (parameters(1) - std::pow(parameters(0), 2.0));
+    Eigen::VectorXd objFuncPartValue(m);
+    Eigen::MatrixXd gradFuncPartValue(m, n);
+
+    objFuncPart(parameters, objFuncPartValue);
+    gradFuncPart(parameters, gradFuncPartValue);
+
+    gradient = 2 * gradFuncPartValue.transpose() * objFuncPartValue;
 
     return;
 }
@@ -29,7 +88,7 @@ int main()
     std::shared_ptr<BaseAlgorithm> algorithm;
     Function objFuncInfoExactDerivative(objFunc, gradFunc);
     Function objFuncInfoApproxDerivative(objFunc);
-    Eigen::Vector2d initialParameters(-5, 10);
+    Eigen::VectorXd initialParameters = Eigen::VectorXd::Constant(n, 1);
     Result result;
 
     // Steepest Descent, Nocedal Line Search, Exact Derivative

@@ -32,3 +32,17 @@ target_link_libraries(
     ${EXAMPLE}
     PRIVATE ${LIBRARY_NAME}
 )
+
+set(EXAMPLE "LinearFullRank")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
+target_link_libraries(
+    ${EXAMPLE}
+    PRIVATE ${LIBRARY_NAME}
+)
+
+set(EXAMPLE "LinearRankOne")
+add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
+target_link_libraries(
+    ${EXAMPLE}
+    PRIVATE ${LIBRARY_NAME}
+)
